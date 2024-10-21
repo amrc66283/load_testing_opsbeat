@@ -110,7 +110,8 @@ class UserBehavior(TaskSet):
                                                     "summary": str(i) + "th time updating the ticket",
                                                     "description" : "test"
                                                     }, headers=self.headers)
-            print(response.get("statusCode"))
+            print("error message")
+            print(response)
             print("ticket updated")
             
             

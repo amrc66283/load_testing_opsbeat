@@ -43,37 +43,31 @@ class UserBehavior(TaskSet):
     def getAllModules(self):
         url = "/api/v1/module"  
         response = self.rest_api_call(url, "get", headers=self.headers)
-        print(response.get("statusCode"))
         
     @task
     def fetchStarDeskModule(self):
         url = "/api/v1/form/module/39"  
         response = self.rest_api_call(url, "get", headers=self.headers)
-        print(response.get("statusCode"))
         
     @task
     def getTicketDetails(self):
         url = "/api/v1/form/name/ticket"  
         response = self.rest_api_call(url, "get", headers=self.headers)
-        print(response.get("statusCode"))
         
     @task
     def xyz(self):
         url = "/api/v1/field/form/258"  
         response = self.rest_api_call(url, "get", headers=self.headers)
-        print(response.get("statusCode"))
 
     @task
     def pqr(self):
         url = "/api/v1/action/form/258"  
         response = self.rest_api_call(url, "get", headers=self.headers)
-        print(response.get("statusCode"))
 
     @task
     def asa(self):
         url = "/api/v1/field/form/258"  
         response = self.rest_api_call(url, "get", headers=self.headers)
-        print(response.get("statusCode"))
 
     @task
     def search(self):
@@ -87,31 +81,29 @@ class UserBehavior(TaskSet):
                                                     "where": [],
                                                     "sort": []
                                                     }, headers=self.headers)
-        print(response.get("statusCode"))
 
         
     @task
     def getPreferences(self):
         url = "/api/v1/form/258/field/preference"  
         response = self.rest_api_call(url, "get", headers=self.headers)
-        print(response.get("statusCode"))
 
 
     @task
     def updateTicketActual(self):
         for i in range(10):
-            url = "https://leadgen-api.dglide.com/api/v1/table/ticket/data/save" , 
-            response = self.rest_api_call(url, "put",
+            url = "/api/v1/table/ticket/data/save"
+            response = self.rest_api_call(url, "post",
                                         json_body= {
                                                     "uuid" : "22b8c8cf-e2ea-40ef-9f85-94045f77e3df",
                                                     "status": "1",
                                                     "priority": "1",
                                                     "requester": "000a76f8-a4a7-4ce3-9e38-a3a1a52e5830",
-                                                    "summary": str(i) + "th time updating the ticket",
+                                                    "summary":  "updating the ticket",
                                                     "description" : "test"
                                                     }, headers=self.headers)
-            print(response.get("statusCode"))
-            print("ticket updated")
+            
+            print(response)
             
             
     def create_ticket(self):
@@ -127,7 +119,6 @@ class UserBehavior(TaskSet):
        
         response = self.rest_api_call(url, "post", json_body=json_body, headers=self.headers)
         self.created_ticket_id = response.get("result").get("uuid")
-        print(f"Created Ticket ID: {self.created_ticket_id}")
 
     def delete_ticket(self):
         """ Function to delete the last created ticket via API. """
@@ -137,7 +128,6 @@ class UserBehavior(TaskSet):
             listOfTickets.append(self.created_ticket_id)
             self.rest_api_call(url, "delete", headers=self.headers, json_body = listOfTickets)
             self.created_ticket_id = None  # Reset the ticket ID after deletion
-            print("deleted successfully")
     @task
     def run_ticket_cycle(self):
         """ Run the ticket creation and deletion in a cycle every minute. """
