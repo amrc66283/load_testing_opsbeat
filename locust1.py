@@ -7,12 +7,11 @@ class UserBehavior(TaskSet):
         self.password = "sahil@dglide.com"
         
         # Perform login and store the token
-        self.token = self.login()
         self.headers = {
-            "Authorization": f"Bearer {self.token}",
-            "X-TenantId" : "tenant1"
+            "Authorization": f"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ3ZmUifQ.Gy4CY4DTnmvMgdXS61PTIV530oKxG_i95fOlJ3CrxaTP5xH3o5qijvOxGAGi077nRenXPYfnf9lLyhvGdQsjOQ",
+            "X-TenantID" : "tenant1"
         }
-        
+        self.login()        
         # Variable to store the last created ticket's ID
         self.created_ticket_id = None
 
@@ -30,7 +29,6 @@ class UserBehavior(TaskSet):
         
         return response.json()
     
-    
     def login(self):
         """ Function to log in and return the token. """
         url = "/api/v1/user/login"
@@ -38,7 +36,7 @@ class UserBehavior(TaskSet):
             "username": self.username,
             "password": self.password
         }
-        response = self.rest_api_call(url, "post", json_body=json_body)
+        response = self.rest_api_call(url, "post", json_body=json_body, headers=self.headers)
         return response.get("result", {}).get("tokenDetail", {}).get("token")
 
     @task
@@ -102,42 +100,44 @@ class UserBehavior(TaskSet):
     @task
     def updateTicketActual(self):
         for i in range(10):
-            url = "https://prod-api.dglide.com/api/v1/table/ticket/data/update/0f401187-0796-40f7-9604-f34367ea9d32"  
+            url = "https://leadgen-api.dglide.com/api/v1/table/ticket/data/save" , 
             response = self.rest_api_call(url, "put",
                                         json_body= {
+                                                    "uuid" : "22b8c8cf-e2ea-40ef-9f85-94045f77e3df",
                                                     "status": "1",
                                                     "priority": "1",
-                                                    "source": "1",
-                                                    "requester": "969e3611-d515-4520-b286-cf531043b31c",
+                                                    "requester": "000a76f8-a4a7-4ce3-9e38-a3a1a52e5830",
                                                     "summary": str(i) + "th time updating the ticket",
+                                                    "description" : "test"
                                                     }, headers=self.headers)
             print(response.get("statusCode"))
             print("ticket updated")
-
-    @task
+            
+            
     def create_ticket(self):
         """ Function to create a ticket via API. """
         url = "/api/v1/table/ticket/data/save"
         json_body = {
             "subject": "summary",
-            "description": "locust load testing going on..."
+            "status" : "1",
+            "priority" : "1",
+            "description": "locust load testing going on...",
+            "requester": "00009578-ce47-45fa-bd5a-3b0da5bb832c" 
         }
        
         response = self.rest_api_call(url, "post", json_body=json_body, headers=self.headers)
         self.created_ticket_id = response.get("result").get("uuid")
         print(f"Created Ticket ID: {self.created_ticket_id}")
 
-    @task
     def delete_ticket(self):
         """ Function to delete the last created ticket via API. """
         if self.created_ticket_id:
             url = "/api/v1/table/ticket/data"
             listOfTickets = []
             listOfTickets.append(self.created_ticket_id)
-            response = self.rest_api_call(url, "delete", headers=self.headers, json_body = listOfTickets)
+            self.rest_api_call(url, "delete", headers=self.headers, json_body = listOfTickets)
             self.created_ticket_id = None  # Reset the ticket ID after deletion
             print("deleted successfully")
-
     @task
     def run_ticket_cycle(self):
         """ Run the ticket creation and deletion in a cycle every minute. """
