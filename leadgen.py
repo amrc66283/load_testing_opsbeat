@@ -3,14 +3,13 @@ import time
 
 class UserBehavior(TaskSet):
     def on_start(self):
-        self.username = "sahil@dglide.com"
-        self.password = "sahil@dglide.com"
+        self.username = "sysadmin@example.com"
+        self.password = "sysadmin"
         
         # Perform login and store the token
         self.token = self.login()
         self.headers = {
-            "Authorization": f"Bearer {self.token}",
-            "X-TenantId" : "tenant1"
+            "Authorization": f"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXNhZG1pbkBleGFtcGxlLmNvbSJ9.51pNq4WnXSYf3yN4md0LhUdHUTg9E8cmTJPeRaWM_oF-gTKQ4-Mcq_vM_s7FhTOiwMxJj0FNGxDEI1w3Ek1obQ",
         }
         
         # Variable to store the last created ticket's ID
@@ -29,8 +28,7 @@ class UserBehavior(TaskSet):
             raise ValueError("Unsupported HTTP method")
         
         return response.json()
-    
-    
+
     def login(self):
         """ Function to log in and return the token. """
         url = "/api/v1/user/login"
@@ -49,7 +47,7 @@ class UserBehavior(TaskSet):
         
     @task
     def fetchStarDeskModule(self):
-        url = "/api/v1/form/module/39"  
+        url = "/api/v1/form/module/38"  
         response = self.rest_api_call(url, "get", headers=self.headers)
         print(response.get("statusCode"))
         
@@ -61,19 +59,19 @@ class UserBehavior(TaskSet):
         
     @task
     def xyz(self):
-        url = "/api/v1/field/form/258"  
+        url = "/api/v1/field/form/242"  
         response = self.rest_api_call(url, "get", headers=self.headers)
         print(response.get("statusCode"))
 
     @task
     def pqr(self):
-        url = "/api/v1/action/form/258"  
+        url = "/api/v1/action/form/242"  
         response = self.rest_api_call(url, "get", headers=self.headers)
         print(response.get("statusCode"))
 
     @task
     def asa(self):
-        url = "/api/v1/field/form/258"  
+        url = "/api/v1/field/form/242"  
         response = self.rest_api_call(url, "get", headers=self.headers)
         print(response.get("statusCode"))
 
@@ -94,7 +92,7 @@ class UserBehavior(TaskSet):
         
     @task
     def getPreferences(self):
-        url = "/api/v1/form/258/field/preference"  
+        url = "/api/v1/form/242/field/preference"  
         response = self.rest_api_call(url, "get", headers=self.headers)
         print(response.get("statusCode"))
 
@@ -102,14 +100,15 @@ class UserBehavior(TaskSet):
     @task
     def updateTicketActual(self):
         for i in range(10):
-            url = "https://prod-api.dglide.com/api/v1/table/ticket/data/update/0f401187-0796-40f7-9604-f34367ea9d32"  
+            url = "https://leadgen-api.dglide.com/api/v1/table/ticket/data/save" , 
             response = self.rest_api_call(url, "put",
                                         json_body= {
+                                                    "uuid" : "00072dff-7a0e-457d-b7a8-87a6c422aab1",
                                                     "status": "1",
                                                     "priority": "1",
-                                                    "source": "1",
-                                                    "requester": "969e3611-d515-4520-b286-cf531043b31c",
+                                                    "requester": "00009578-ce47-45fa-bd5a-3b0da5bb832c",
                                                     "summary": str(i) + "th time updating the ticket",
+                                                    "description" : "test"
                                                     }, headers=self.headers)
             print(response.get("statusCode"))
             print("ticket updated")
@@ -120,10 +119,14 @@ class UserBehavior(TaskSet):
         url = "/api/v1/table/ticket/data/save"
         json_body = {
             "subject": "summary",
-            "description": "locust load testing going on..."
+            "status" : "1",
+            "priority" : "1",
+            "description": "locust load testing going on...",
+            "requester": "00009578-ce47-45fa-bd5a-3b0da5bb832c" 
         }
        
         response = self.rest_api_call(url, "post", json_body=json_body, headers=self.headers)
+        print(response)
         self.created_ticket_id = response.get("result").get("uuid")
         print(f"Created Ticket ID: {self.created_ticket_id}")
 
